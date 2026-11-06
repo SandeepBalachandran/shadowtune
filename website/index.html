@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShadowTune — Windows app for the Shadow X Pro mouse</title>
+  <meta name="description" content="An unofficial Windows app for the EvoFox Shadow X Pro mouse: DPI, buttons, lighting, profiles, tray battery, power keys and shortcuts — no browser needed." />
+  <meta property="og:title" content="ShadowTune" />
+  <meta property="og:description" content="Unofficial Windows app for the EvoFox Shadow X Pro mouse. No browser needed." />
+  <!-- LinkedIn needs a full URL here: replace with https://YOUR-SITE.vercel.app/img/buttons.png after deploying -->
+  <meta property="og:image" content="img/buttons.png" />
+  <link rel="icon" href="icon.png" />
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --panel-2: #1f232c;
+      --line: #2a2f3a;
+      --text: #e8eaef;
+      --muted: #8b93a3;
+      --accent: #ff5a1f;
+      --accent-soft: #ff5a1f1f;
+      --ok: #3ccf7e;
+      --warn: #f2b33d;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.6 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); }
+    img { max-width: 100%; display: block; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+    /* header */
+    header.top { border-bottom: 1px solid var(--line); }
+    header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .brand { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font-weight: 600; }
+    .brand img { width: 30px; height: 30px; border-radius: 7px; }
+    nav a { color: var(--muted); text-decoration: none; font-size: 14px; margin-left: 22px; }
+    nav a:hover { color: var(--text); }
+    @media (max-width: 640px) { nav a:not(.keep) { display: none; } }
+
+    /* hero */
+    .hero { padding: 72px 0 40px; text-align: center; }
+    .pill {
+      display: inline-block; font-size: 13px; color: var(--muted);
+      border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; margin-bottom: 20px;
+    }
+    h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.1; margin: 0 0 18px; letter-spacing: -0.02em; }
+    h1 span { color: var(--accent); }
+    .lead { color: var(--muted); font-size: clamp(16px, 2.2vw, 19px); max-width: 640px; margin: 0 auto 32px; }
+    .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; border-radius: 10px;
+      font-weight: 600; text-decoration: none; font-size: 16px; border: 1px solid transparent;
+    }
+    .btn.primary { background: var(--accent); color: #fff; }
+    .btn.primary:hover { filter: brightness(1.08); }
+    .btn.ghost { border-color: var(--line); color: var(--text); }
+    .btn.ghost:hover { background: var(--panel); }
+    .btn svg { width: 18px; height: 18px; }
+    .meta { color: var(--muted); font-size: 13px; margin-top: 14px; }
+    .shot {
+      margin: 48px auto 0; max-width: 960px; border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--line); box-shadow: 0 30px 80px -20px #ff5a1f33, 0 10px 40px #0008;
+    }
+
+    /* sections */
+    section { padding: 64px 0; border-top: 1px solid var(--line); }
+    h2 { font-size: clamp(26px, 4vw, 34px); margin: 0 0 10px; letter-spacing: -0.01em; }
+    .sub { color: var(--muted); margin: 0 0 36px; max-width: 680px; }
+
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+    .card h3 { margin: 0 0 6px; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+    .card p { margin: 0; color: var(--muted); font-size: 14.5px; }
+    .ico {
+      width: 32px; height: 32px; border-radius: 8px; background: var(--accent-soft); color: var(--accent);
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .ico svg { width: 18px; height: 18px; }
+
+    /* gallery */
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .tabs button {
+      background: var(--panel); border: 1px solid var(--line); color: var(--muted); font: inherit; font-size: 14px;
+      padding: 7px 14px; border-radius: 8px; cursor: pointer;
+    }
+    .tabs button[aria-selected='true'] { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .gallery { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+    .caption { color: var(--muted); font-size: 14px; margin-top: 12px; }
+
+    /* two columns */
+    .cols { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
+    .cols ul { margin: 10px 0 0; padding-left: 20px; color: var(--muted); font-size: 14.5px; }
+    .cols li { margin: 4px 0; }
+    .tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
+    .tag.ok { background: #3ccf7e22; color: var(--ok); }
+    .tag.warn { background: #f2b33d22; color: var(--warn); }
+
+    /* steps */
+    ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+    ol.steps li {
+      counter-increment: s; background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+      padding: 16px 18px 16px 60px; position: relative; color: var(--muted);
+    }
+    ol.steps li b { color: var(--text); }
+    ol.steps li::before {
+      content: counter(s); position: absolute; left: 18px; top: 15px; width: 28px; height: 28px; border-radius: 50%;
+      background: var(--accent-soft); color: var(--accent); font-weight: 700; display: grid; place-items: center; font-size: 14px;
+    }
+    kbd {
+      font: 13px ui-monospace, Consolas, monospace; background: var(--panel-2); border: 1px solid var(--line);
+      border-radius: 5px; padding: 1px 6px; color: var(--text);
+    }
+
+    /* faq */
+    details { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 0 18px; margin-bottom: 10px; }
+    summary { cursor: pointer; padding: 15px 0; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; color: var(--muted); font-weight: 400; }
+    details[open] summary::after { content: '−'; }
+    details p { margin: 0 0 16px; color: var(--muted); font-size: 15px; }
+
+    .disclaimer {
+      background: #f2b33d12; border: 1px solid #f2b33d55; border-radius: 12px; padding: 20px 22px; color: var(--text);
+    }
+    .disclaimer h3 { margin: 0 0 8px; color: var(--warn); font-size: 17px; }
+    .disclaimer p { margin: 0 0 8px; color: var(--muted); font-size: 15px; }
+    .disclaimer p:last-child { margin: 0; }
+
+    footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 14px; }
+    footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .stack { display: flex; flex-wrap: wrap; gap: 8px; }
+    .stack span { border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px; font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="#"><img src="icon.png" alt="" /> ShadowTune</a>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#install">Install</a>
+        <a href="#faq">FAQ</a>
+        <a class="keep" href="#download" data-download>Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero wrap">
+      <span class="pill">Unofficial · Free · Windows 10 &amp; 11</span>
+      <h1>Your EvoFox Shadow X Pro,<br /><span>without the browser.</span></h1>
+      <p class="lead">
+        A small Windows app for the EvoFox Shadow X Pro wireless mouse. Change DPI, buttons, lighting and profiles.
+        Plus tray battery, power keys and shortcuts that the web configurator can't do.
+      </p>
+      <div class="cta" id="download">
+        <a class="btn primary" href="#" data-download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg>
+          Download for Windows
+        </a>
+        <a class="btn ghost" href="#features">See what it does</a>
+      </div>
+      <p class="meta"><span data-version>v0.1.0</span> · 64-bit installer · about 80 MB · no admin rights needed</p>
+      <div class="shot"><img src="img/buttons.png" alt="ShadowTune: Buttons page with an interactive drawing of the mouse" width="1104" height="721" /></div>
+    </div>
+
+    <section id="features">
+      <div class="wrap">
+        <h2>Everything the web app does</h2>
+        <p class="sub">The same settings as the official web configurator. Everything is saved on the mouse, so it works on any PC.</p>
+        <div class="grid">
+          <div class="card"><h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg></span>DPI stages</h3><p>1–5 stages from 200 to 6400 DPI, with any value in between.</p></div>
+          <div class="card"><h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="3" width="12" height="18" rx="6" /><path d="M12 7v3" /></svg></span>Button remapping</h3><p>Mouse, media, browser and system actions, or any key combination.</p></div>
+          <div class="card"><h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" /><circle cx="12" cy="12" r="4" /></svg></span>Lighting</h3><p>All lighting effects, including off.</p></div>
+          <div class="card"><h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h3l3-7 4 14 3-7h3" /></svg></span>Polling &amp; scroll</h3><p>Polling rate up to 1000 Hz and scroll direction.</p></div>
+          <div class="card"><h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10" /></svg></span>Profiles</h3><p>Save setups on your PC, then export, import and switch in one click.</p></div>
+          <div class="card"><h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="7" width="16" height="10" rx="2" /><path d="M21 11v2" /><path d="M6 10v4M9 10v4" /></svg></span>Battery &amp; firmware</h3><p>Battery level, charging status and firmware version at a glance.</p></div>
+        </div>
+
+        <h2 style="margin-top: 56px">…and things it can't</h2>
+        <p class="sub">A desktop app can sit in the tray and react to your mouse all day. A browser tab can't.</p>
+        <div class="grid">
+          <div class="card"><h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z" /></svg></span>Power keys</h3><p>Make a side button open an app or website, type text, mute your mic, take a screenshot or lock the PC.</p></div>
+          <div class="card"><h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2" /><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10" /></svg></span>Keyboard shortcuts</h3><p>Global hotkeys, e.g. <kbd>Ctrl+Alt+D</kbd> for the next DPI stage or <kbd>Ctrl+Alt+L</kbd> for lights.</p></div>
+          <div class="card"><h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 15h18M15 18h3" /></svg></span>Tray quick menu</h3><p>Right-click the tray icon to switch DPI, toggle lights or apply a profile.</p></div>
+          <div class="card"><h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17l5-5 4 4 8-9" /><path d="M14 7h6v6" /></svg></span>Battery history</h3><p>Battery % on the tray icon, a history chart, a time-left estimate, and low-battery and fully-charged alerts.</p></div>
+          <div class="card"><h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4" /></svg></span>Per-program profiles</h3><p>Optional: switch profile automatically when you open a game or app. Off by default.</p></div>
+          <div class="card"><h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l7 4v5c0 4.5-3 8-7 9-4-1-7-4.5-7-9V7z" /><path d="m9 12 2 2 4-4" /></svg></span>Built to be safe</h3><p>Every change is read back from the mouse to confirm it saved, automatic changes are rate-limited, and the firmware is never touched.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screens">
+      <div class="wrap">
+        <h2>A closer look</h2>
+        <p class="sub">Screenshots from the app's built-in demo device.</p>
+        <div class="tabs" role="tablist">
+          <button role="tab" aria-selected="true" data-img="buttons" data-cap="Click a button on the drawing to remap it. Each callout shows what that button does.">Buttons</button>
+          <button role="tab" aria-selected="false" data-img="performance" data-cap="Up to five DPI stages, any value from 200 to 6400.">Performance</button>
+          <button role="tab" aria-selected="false" data-img="shortcuts" data-cap="Power keys: turn a side button into an app launcher, mic mute, screenshot and more.">Shortcuts</button>
+          <button role="tab" aria-selected="false" data-img="settings" data-cap="Start with Windows, tray alerts, Windows pointer settings and automatic profile switching.">Settings</button>
+        </div>
+        <div class="gallery"><img id="gallery-img" src="img/buttons.png" alt="Buttons page" width="1104" height="721" /></div>
+        <p class="caption" id="gallery-cap">Click a button on the drawing to remap it. Each callout shows what that button does.</p>
+      </div>
+    </section>
+
+    <section id="offline">
+      <div class="wrap">
+        <h2>What works when the app is closed?</h2>
+        <p class="sub">The mouse stores its own settings. The extras need the app, which runs quietly in the tray.</p>
+        <div class="cols">
+          <div class="card">
+            <h3><span class="tag ok">Saved on the mouse</span></h3>
+            <p>These keep working with the app closed, even on another PC:</p>
+            <ul>
+              <li>DPI stages, polling rate, lighting, scroll direction</li>
+              <li>Button remaps: clicks, media keys, browser keys, key combinations</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3><span class="tag warn">Needs the app running</span></h3>
+            <p>Turn on <b>Settings → Start with Windows</b> so these always work:</p>
+            <ul>
+              <li>Power keys (open apps, mute mic, lights on/off…)</li>
+              <li>Keyboard shortcuts and the tray quick menu</li>
+              <li>Battery alerts, history and the tray battery icon</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="install">
+      <div class="wrap">
+        <h2>Install in a minute</h2>
+        <p class="sub">Use the USB receiver or the cable. Bluetooth mode can't be configured.</p>
+        <ol class="steps">
+          <li><b>Download</b> <kbd data-filename>ShadowTune-Setup-0.1.0.exe</kbd> and run it.</li>
+          <li><b>If Windows SmartScreen warns you</b>, click <b>More info → Run anyway</b>. The app isn't code-signed (that costs money each year), so Windows doesn't recognise it yet.</li>
+          <li><b>Plug in the receiver</b> and open ShadowTune from the Start menu. It finds the mouse automatically.</li>
+          <li><b>Close the official web configurator</b> if it's open in a browser tab. Two apps writing to the mouse at once undo each other's changes.</li>
+          <li><b>Change settings and click Apply to mouse.</b> No mouse to hand? Turn on <b>Demo device</b> in the top bar.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="wrap">
+        <h2>FAQ</h2>
+        <details><summary>Is this the official EvoFox software?</summary><p>No. It's a personal project by an individual, not made, reviewed or supported by EvoFox or Amkette. It sends the same commands the official web configurator sends.</p></details>
+        <details><summary>Can it damage my mouse?</summary><p>It never updates or writes firmware. It changes only the settings the web configurator changes, reads every change back to confirm it saved, and limits how often automatic changes can happen. Still, it's unofficial, so use it at your own risk.</p></details>
+        <details><summary>Which mice does it support?</summary><p>Only the EvoFox Shadow X Pro, connected by its 2.4 GHz USB receiver or by cable. Other EvoFox models may use different commands and aren't supported.</p></details>
+        <details><summary>Does it work on Mac or Linux?</summary><p>No, Windows 10 and 11 (64-bit) only.</p></details>
+        <details><summary>Does it collect any data?</summary><p>No. There are no accounts, analytics or internet requests. Profiles and settings stay in a folder on your PC.</p></details>
+        <details><summary>How do I uninstall it?</summary><p>Windows Settings → Apps → Installed apps → ShadowTune → Uninstall. Your mouse keeps its current settings. To reset them, use Diagnostics → Restore factory settings first.</p></details>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="disclaimer">
+          <h3>⚠ Disclaimer</h3>
+          <p>ShadowTune is an unofficial, independent project made by one person. It is not affiliated with, endorsed by or supported by EvoFox or Amkette. "EvoFox" and "Shadow X Pro" are their trademarks and are used here only to say which mouse this works with.</p>
+          <p>The software is provided as is, with no warranty. Use it at your own risk. The author isn't responsible for any problems with your device, settings or system. If something goes wrong, the official web configurator can always restore your mouse.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div>ShadowTune · built with the help of Claude</div>
+      <div class="stack"><span>Electron</span><span>React</span><span>TypeScript</span><span>Tailwind CSS</span><span>node-hid</span></div>
+    </div>
+  </footer>
+
+  <script>
+    // ── Change these when you publish a new version ──────────────────────────
+    const VERSION = '0.1.0'
+    const DOWNLOAD_URL = 'https://github.com/SandeepBalachandran/shadowtune/releases/latest/download/ShadowTune-Setup-0.1.0.exe'
+    // ─────────────────────────────────────────────────────────────────────────
+
+    document.querySelectorAll('[data-download]').forEach((a) => (a.href = DOWNLOAD_URL))
+    document.querySelectorAll('[data-version]').forEach((e) => (e.textContent = 'v' + VERSION))
+    document.querySelectorAll('[data-filename]').forEach((e) => (e.textContent = `ShadowTune-Setup-${VERSION}.exe`))
+
+    const img = document.getElementById('gallery-img')
+    const cap = document.getElementById('gallery-cap')
+    document.querySelectorAll('.tabs button').forEach((b) =>
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.tabs button').forEach((x) => x.setAttribute('aria-selected', String(x === b)))
+        img.src = `img/${b.dataset.img}.png`
+        img.alt = `${b.textContent} page`
+        cap.textContent = b.dataset.cap
+      })
+    )
+  </script>
+</body>
+</html>

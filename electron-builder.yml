@@ -1,0 +1,37 @@
+appId: com.shadowtune.app
+productName: ShadowTune
+directories:
+  output: dist
+  buildResources: build
+files:
+  - out/**
+  - package.json
+  # Native libraries ship binaries for every OS; keep only Windows x64 (saves ~70 MB).
+  - '!node_modules/koffi/build/koffi/!(win32_x64)/**'
+  - '!node_modules/koffi/{src,vendor,doc}/**'
+  - '!node_modules/node-hid/prebuilds/!(HID-win32-x64)/**'
+  - '!node_modules/node-hid/src/**'
+# node-hid ships N-API prebuilds that work in Electron unchanged; rebuilding needs a C++ toolchain.
+npmRebuild: false
+asarUnpack:
+  # node-hid's native binding must live outside the asar archive.
+  - '**/*.node'
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch: [x64]
+  artifactName: ShadowTune-Setup-${version}.${ext}
+  # Unsigned build. Skipping this avoids the winCodeSign download, whose archive contains macOS
+  # symlinks that can't be extracted without admin/Developer Mode. The exe icon and version info
+  # are stamped by scripts/after-pack.cjs instead. Re-enable with a code-signing certificate.
+  signAndEditExecutable: false
+afterPack: scripts/after-pack.cjs
+nsis:
+  oneClick: false
+  perMachine: false # per-user install, no administrator rights needed
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  deleteAppDataOnUninstall: false # keep the user's profiles
